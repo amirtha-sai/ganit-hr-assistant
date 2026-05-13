@@ -19,50 +19,17 @@ st.set_page_config(
 )
 
 # =====================================================
-# CUSTOM CSS
-# =====================================================
-
-# st.markdown("""
-# <style>
-
-# .chunk-box {
-#     padding: 18px;
-#     border-radius: 12px;
-#     background-color: #1e1e1e;
-#     margin-bottom: 18px;
-#     border-left: 5px solid #4CAF50;
-# }
-
-# .citation {
-#     background-color: #262730;
-#     padding: 12px;
-#     border-radius: 10px;
-#     margin-top: 10px;
-#     font-size: 14px;
-#     line-height: 1.6;
-# }
-
-# .metadata {
-#     color: #B0B0B0;
-#     font-size: 13px;
-#     margin-bottom: 10px;
-# }
-
-# .score {
-#     color: #4CAF50;
-#     font-weight: bold;
-# }
-
-# </style>
-# """, unsafe_allow_html=True)
-
-# =====================================================
 # SIDEBAR
 # =====================================================
 
 with st.sidebar:
 
     st.title("🤖 HR Assistant")
+
+    employee_id = st.text_input(
+        "Employee ID",
+        value="EMP001"
+    )
 
     st.markdown("---")
 
@@ -146,7 +113,8 @@ if question:
             try:
 
                 payload = {
-                    "question": question
+                    "question": question,
+                    "employee_id": employee_id
                 }
 
                 response = requests.post(
