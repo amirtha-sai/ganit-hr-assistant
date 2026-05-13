@@ -9,12 +9,12 @@ import json
 API_URL = "https://dtl1p82dzl.execute-api.us-east-1.amazonaws.com/dev/chat"
 
 # =====================================================
-# PAGE CONFIG
+# PAGE SETTINGS
 # =====================================================
 
 st.set_page_config(
     page_title="HR Policy Assistant",
-    page_icon="🤖",
+    page_icon="💼",
     layout="wide"
 )
 
@@ -24,7 +24,7 @@ st.set_page_config(
 
 with st.sidebar:
 
-    st.title("🤖 HR Assistant")
+    st.title("💼 HR Assistant")
 
     employee_id = st.text_input(
         "Employee ID",
@@ -34,20 +34,20 @@ with st.sidebar:
     st.markdown("---")
 
     st.markdown("""
-    ### Features
+    ### What you can ask
 
-    ✅ HR Policy Q&A  
-    ✅ Leave Policy Search  
-    ✅ Reimbursement Guidance  
-    ✅ Semantic Search  
-    ✅ Claude AI Answers  
-    ✅ Policy Citations  
-    ✅ Vector Search
+    • Leave policies  
+    • Reimbursements  
+    • Benefits & insurance  
+    • Travel policy  
+    • Workplace conduct  
+    • HR guidelines  
+    • Policy references  
     """)
 
     st.markdown("---")
 
-    st.caption("Powered by AWS Bedrock + OpenSearch")
+    st.caption("Built with AWS Bedrock & OpenSearch")
 
 # =====================================================
 # SESSION STATE
@@ -60,20 +60,19 @@ if "messages" not in st.session_state:
 # HEADER
 # =====================================================
 
-st.title("🎯 HR Policy Assistant")
+st.title("HR Policy Assistant")
 
 st.caption(
-    "Ask questions about leave policy, reimbursement, benefits, conduct, travel, POSH, and more."
+    "Get quick answers from company HR policies and guidelines."
 )
 
 # =====================================================
-# DISPLAY CHAT HISTORY
+# CHAT HISTORY
 # =====================================================
 
 for message in st.session_state.messages:
 
     with st.chat_message(message["role"]):
-
         st.markdown(message["content"])
 
 # =====================================================
@@ -81,11 +80,11 @@ for message in st.session_state.messages:
 # =====================================================
 
 question = st.chat_input(
-    "Ask an HR policy question..."
+    "Ask an HR-related question..."
 )
 
 # =====================================================
-# PROCESS QUESTION
+# HANDLE QUESTION
 # =====================================================
 
 if question:
@@ -108,7 +107,7 @@ if question:
 
     with st.chat_message("assistant"):
 
-        with st.spinner("Searching HR policies..."):
+        with st.spinner("Checking policies..."):
 
             try:
 
@@ -128,7 +127,7 @@ if question:
 
                 result = response.json()
 
-                # Lambda may wrap response inside "body"
+                # Lambda may return nested body
                 if "body" in result:
 
                     if isinstance(result["body"], str):
@@ -137,12 +136,12 @@ if question:
                         result = result["body"]
 
                 # -------------------------------------------------
-                # EXTRACT DATA
+                # EXTRACT RESPONSE
                 # -------------------------------------------------
 
                 answer = result.get(
                     "answer",
-                    "No answer returned."
+                    "No response received."
                 )
 
                 citations = result.get(
@@ -157,13 +156,13 @@ if question:
                 st.markdown(answer)
 
                 # -------------------------------------------------
-                # DISPLAY CITATIONS
+                # POLICY REFERENCES
                 # -------------------------------------------------
 
-                if len(citations) > 0:
+                if citations:
 
                     st.markdown("---")
-                    st.markdown("## 📚 Policy Sources")
+                    st.markdown("### Referenced Policies")
 
                     for citation in citations:
 
@@ -198,22 +197,18 @@ if question:
                         )
 
                         # -----------------------------------------
-                        # EXPANDABLE SOURCE CARD
+                        # SOURCE CARD
                         # -----------------------------------------
 
                         with st.expander(
-                            f"📄 Chunk {chunk_number} | {policy_name} | Score: {round(score, 3)}"
+                            f"{policy_name} • Chunk {chunk_number}"
                         ):
 
                             st.markdown(f"""
-                **Policy:** {policy_name}
-
-                **Section:** {section}
-
-                **Page:** {page}
-
-                **Similarity Score:** {round(score, 3)}
-                """)
+**Section:** {section}  
+**Page:** {page}  
+**Match Score:** {round(score, 3)}
+""")
 
                             st.markdown("---")
 
@@ -222,10 +217,11 @@ if question:
                 else:
 
                     st.info(
-                        "No supporting policy chunks returned."
+                        "No policy references available."
                     )
+
                 # -------------------------------------------------
-                # SAVE CHAT HISTORY
+                # SAVE CHAT
                 # -------------------------------------------------
 
                 st.session_state.messages.append({
@@ -235,7 +231,7 @@ if question:
 
             except Exception as e:
 
-                error_message = f"Error: {str(e)}"
+                error_message = f"Something went wrong: {str(e)}"
 
                 st.error(error_message)
 
